@@ -1,18 +1,18 @@
 # raylib-template
 ```
 [X] Move core.c logic into core.h using macro magic
-[X] Add basic unit tests in main.c
+[X] Basic unit tests in main.c
+[ ] Data structure visualisation and interaction (separate project)
 
-IMPLEMENTED DATA STRUCTURES:
+DATA STRUCTURES:
 [X] Stack
 [X] Queue (Circular)
+[X] Grid / Matrix / 2D Array (Using 1D array)
 [ ] Linked List (Integer indexing in array)
 [ ] Hashset (Open addressing)
 [ ] Hashmap (Open addressing)
 [ ] Binary Tree (AVL balancing)
 
-IMPLEMENTED HELPER FUNCTIONS:
-[ ] 2D array indexing into 1D array macro
-[ ] Min and Max function
-[ ] Quicksort
+HELPER FUNCTIONS:
+[X] Min and Max function
 ```
