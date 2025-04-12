@@ -4,7 +4,7 @@
 [X] Add data structure visualisation in main.c
 
 IMPLEMENTED DATA STRUCTURES:
-[ ] Stack
+[X] Stack
 [X] Queue (Circular)
 [ ] Linked List (Integer indexing in array)
 [ ] Hashset (Open addressing)
