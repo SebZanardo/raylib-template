@@ -59,16 +59,10 @@ int main(void) {
             assert(Grid_get(&grid, x, y) == 1);
         }
     }
-    Grid_clear(&grid);
+    Grid_fill(&grid, 2);
     for (uint8_t y = 0; y < NODES; y++) {
         for (uint8_t x = 0; x < NODES; x++) {
-            assert(Grid_get(&grid, x, y) == 0);
-        }
-    }
-    Grid_fill(&grid, 1);
-    for (uint8_t y = 0; y < NODES; y++) {
-        for (uint8_t x = 0; x < NODES; x++) {
-            assert(Grid_get(&grid, x, y) == 1);
+            assert(Grid_get(&grid, x, y) == 2);
         }
     }
 ////////////////////////////////////////////////////////////////////////////////
