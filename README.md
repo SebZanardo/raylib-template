@@ -1,7 +1,7 @@
 # raylib-template
 ```
 [X] Move core.c logic into core.h using macro magic
-[X] Add data structure visualisation in main.c
+[X] Add basic unit tests in main.c
 
 IMPLEMENTED DATA STRUCTURES:
 [X] Stack
