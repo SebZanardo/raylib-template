@@ -28,15 +28,15 @@ if [ -z $1 ]; then
 
 elif [ $1 = $LINUX ]; then
     # https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux
-    cc src/main.c -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -Wall -o game.exe
+    cc src/main.c src/core.c -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -Wall -o game.exe
 
 elif [ $1 = $MACOS ]; then
     # https://github.com/raysan5/raylib/wiki/Working-on-macOS
-    eval cc src/main.c -framework IOKit -framework Cocoa -framework OpenGL $(pkg-config --libs --cflags raylib) -Wall -o game.exe
+    eval cc src/main.c src/core.c -framework IOKit -framework Cocoa -framework OpenGL $(pkg-config --libs --cflags raylib) -Wall -o game.exe
 
 elif [ $1 = $WINDOWS ]; then
     # https://github.com/raysan5/raylib/wiki/Working-on-Windows
-    gcc src/main.c -lraylib -lgdi32 -lwinmm -Wall -o game.exe
+    gcc src/main.c src/core.c -lraylib -lgdi32 -lwinmm -Wall -o game.exe
 
 elif [ $1 = $WEB ]; then
     if [ -z "$EMSDK" ]; then
@@ -47,7 +47,7 @@ elif [ $1 = $WEB ]; then
     mkdir -p web
 
     # https://github.com/raysan5/raylib/wiki/Working-for-Web-(HTML5)v.sh
-    emcc -o web/game.html src/main.c -Os -Wall $HOME/raylib/src/web/libraylib.web.a \
+    emcc -o web/game.html src/main.c src/core.c -Os -Wall $HOME/raylib/src/web/libraylib.web.a \
         -I. -I$HOME/raylib/src -L. -L$HOME/raylib/src/web \
         -s USE_GLFW=3 \
         -s ASYNCIFY \
