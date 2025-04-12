@@ -32,8 +32,6 @@
     static inline void name##_clear(name *stack);                              \
                                                                                \
     static inline bool name##_init(name *stack, uint32_t capacity) {           \
-        name##_free(stack);                                                    \
-                                                                               \
         stack->items = (type *) malloc(capacity * sizeof(type));               \
                                                                                \
         if (stack->items == NULL) return false;                                \
@@ -93,8 +91,6 @@
     static inline void name##_clear(name *queue);                              \
                                                                                \
     static inline bool name##_init(name *queue, uint32_t capacity) {           \
-        name##_free(queue);                                                    \
-                                                                               \
         queue->items = (type *) malloc(capacity * sizeof(type));               \
                                                                                \
         if (queue->items == NULL) return false;                                \
@@ -164,8 +160,6 @@
     static inline bool name##_init(                                            \
         name *grid, uint32_t width, uint32_t height                            \
     ) {                                                                        \
-        name##_free(grid);                                                     \
-                                                                               \
         uint64_t capacity = width * height;                                    \
         grid->cells = (type *) malloc(capacity * sizeof(type));                \
                                                                                \
