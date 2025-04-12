@@ -1,5 +1,8 @@
 # raylib-template
 ```
+[X] Move core.c logic into core.h using macro magic
+[ ] Add data structure visualisation in main.c
+
 IMPLEMENTED DATA STRUCTURES:
 [ ] Stack
 [X] Queue (Circular)
@@ -12,8 +15,4 @@ IMPLEMENTED HELPER FUNCTIONS:
 [ ] 2D array indexing into 1D array macro
 [ ] Min and Max function
 [ ] Quicksort
-
-LARGE CHANGES:
-[ ] Move core.c logic into core.h using macro magic
-[ ] Add data structure visualisation in main.c
 ```
