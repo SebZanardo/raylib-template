@@ -19,22 +19,22 @@
 ////////////////////////////////////////////////////////////////////////////////
 #define DEFINE_TYPED_STACK(type, name)                                         \
     typedef struct {                                                           \
-        uint32_t head;                                                         \
-        uint32_t capacity;                                                     \
+        uint64_t head;                                                         \
+        uint64_t capacity;                                                     \
         type *items;                                                           \
     } name;                                                                    \
                                                                                \
-    bool name##_init(name *stack, uint32_t capacity);                          \
-    void name##_free(name *stack);                                             \
-    bool name##_append(name *stack, type item);                                \
-    bool name##_pop(name *stack, type *item);                                  \
-    uint32_t name##_length(name *stack);                                       \
-    void name##_clear(name *stack);                                            \
+    static inline bool name##_init(name *stack, uint64_t capacity);            \
+    static inline void name##_free(name *stack);                               \
+    static inline bool name##_append(name *stack, type item);                  \
+    static inline bool name##_pop(name *stack, type *item);                    \
+    static inline uint64_t name##_length(name *stack);                         \
+    static inline void name##_clear(name *stack);                              \
                                                                                \
-    bool name##_init(name *stack, uint32_t capacity) {                         \
+    static inline bool name##_init(name *stack, uint64_t capacity) {           \
         name##_free(stack);                                                    \
                                                                                \
-        stack->items = malloc(capacity * sizeof(type));                        \
+        stack->items = (type *) malloc(capacity * sizeof(type));               \
                                                                                \
         if (stack->items == NULL) return false;                                \
                                                                                \
@@ -44,12 +44,12 @@
         return true;                                                           \
     }                                                                          \
                                                                                \
-    void name##_free(name *stack) {                                            \
+    static inline void name##_free(name *stack) {                              \
         free(stack->items);                                                    \
         stack->items = NULL;                                                   \
     }                                                                          \
                                                                                \
-    bool name##_append(name *stack, type item) {                               \
+    static inline bool name##_append(name *stack, type item) {                 \
         if (stack->head >= stack->capacity) return false;                      \
                                                                                \
         stack->items[stack->head++] = item;                                    \
@@ -57,7 +57,7 @@
         return true;                                                           \
     }                                                                          \
                                                                                \
-    bool name##_pop(name *stack, type *item) {                                 \
+    static inline bool name##_pop(name *stack, type *item) {                   \
         if (stack->head == 0) return false;                                    \
                                                                                \
         *item = stack->items[stack->head--];                                   \
@@ -65,11 +65,11 @@
         return true;                                                           \
     }                                                                          \
                                                                                \
-    uint32_t name##_length(name *stack) {                                      \
+    static inline uint64_t name##_length(name *stack) {                        \
         return stack->head;                                                    \
     }                                                                          \
                                                                                \
-    void name##_clear(name *stack) {                                           \
+    static inline void name##_clear(name *stack) {                             \
         stack->head = 0;                                                       \
     }                                                                          \
 
@@ -79,23 +79,23 @@
 ////////////////////////////////////////////////////////////////////////////////
 #define DEFINE_TYPED_QUEUE(type, name)                                         \
     typedef struct {                                                           \
-        uint32_t head;                                                         \
-        uint32_t tail;                                                         \
-        uint32_t capacity;                                                     \
+        uint64_t head;                                                         \
+        uint64_t tail;                                                         \
+        uint64_t capacity;                                                     \
         type *items;                                                           \
     } name;                                                                    \
                                                                                \
-    bool name##_init(name *queue, uint32_t capacity);                          \
-    void name##_free(name *queue);                                             \
-    bool name##_append(name *queue, type item);                                \
-    bool name##_pop(name *queue, type *item);                                  \
-    uint32_t name##_length(name *queue);                                       \
-    void name##_clear(name *queue);                                            \
+    static inline bool name##_init(name *queue, uint64_t capacity);            \
+    static inline void name##_free(name *queue);                               \
+    static inline bool name##_append(name *queue, type item);                  \
+    static inline bool name##_pop(name *queue, type *item);                    \
+    static inline uint64_t name##_length(name *queue);                         \
+    static inline void name##_clear(name *queue);                              \
                                                                                \
-    bool name##_init(name *queue, uint32_t capacity) {                         \
+    static inline bool name##_init(name *queue, uint64_t capacity) {           \
         name##_free(queue);                                                    \
                                                                                \
-        queue->items = malloc(capacity * sizeof(type));                        \
+        queue->items = (type *) malloc(capacity * sizeof(type));               \
                                                                                \
         if (queue->items == NULL) return false;                                \
                                                                                \
@@ -105,13 +105,13 @@
         return true;                                                           \
     }                                                                          \
                                                                                \
-    void name##_free(name *queue) {                                            \
+    static inline void name##_free(name *queue) {                              \
         free(queue->items);                                                    \
         queue->items = NULL;                                                   \
     }                                                                          \
                                                                                \
-    bool name##_append(name *queue, type item) {                               \
-        uint32_t next = (queue->tail + 1) % queue->capacity;                   \
+    static inline bool name##_append(name *queue, type item) {                 \
+        uint64_t next = (queue->tail + 1) % queue->capacity;                   \
                                                                                \
         if (next == queue->head) return false;                                 \
                                                                                \
@@ -121,7 +121,7 @@
         return true;                                                           \
     }                                                                          \
                                                                                \
-    bool name##_pop(name *queue, type *item) {                                 \
+    static inline bool name##_pop(name *queue, type *item) {                   \
         if (queue->tail == queue->head) return false;                          \
                                                                                \
         *item = queue->items[queue->head];                                     \
@@ -130,11 +130,11 @@
         return true;                                                           \
     }                                                                          \
                                                                                \
-    uint32_t name##_length(name *queue) {                                      \
+    static inline uint64_t name##_length(name *queue) {                        \
         return (queue->tail + queue->capacity - queue->head) % queue->capacity;\
     }                                                                          \
                                                                                \
-    void name##_clear(name *queue) {                                           \
+    static inline void name##_clear(name *queue) {                             \
         queue->head = 0;                                                       \
         queue->tail = 0;                                                       \
     }                                                                          \
@@ -151,17 +151,24 @@
         type *cells;                                                           \
     } name;                                                                    \
                                                                                \
-    bool name##_init(name *grid, uint32_t width, uint32_t height);             \
-    void name##_free(name *grid);                                              \
-    type name##_get(name *grid, uint32_t x, uint32_t y);                       \
-    void name##_set(name *grid, uint32_t x, uint32_t y, type cell);            \
-    void name##_clear(name *grid);                                             \
+    static inline bool name##_init(                                            \
+        name *grid, uint32_t width, uint32_t height                            \
+    );                                                                         \
+    static inline void name##_free(name *grid);                                \
+    static inline type name##_get(name *grid, uint32_t x, uint32_t y);         \
+    static inline void name##_set(                                             \
+        name *grid, uint32_t x, uint32_t y, type cell                          \
+    );                                                                         \
+    static inline void name##_fill(name *grid, type cell);                     \
+    static inline void name##_clear(name *grid);                               \
                                                                                \
-    bool name##_init(name *grid, uint32_t width, uint32_t height) {            \
+    static inline bool name##_init(                                            \
+        name *grid, uint32_t width, uint32_t height                            \
+    ) {                                                                        \
         name##_free(grid);                                                     \
                                                                                \
         uint64_t capacity = width * height;                                    \
-        grid->cells = malloc(capacity * sizeof(type));                         \
+        grid->cells = (type *) malloc(capacity * sizeof(type));                \
                                                                                \
         if (grid->cells == NULL) return false;                                 \
                                                                                \
@@ -174,20 +181,26 @@
         return true;                                                           \
     }                                                                          \
                                                                                \
-    void name##_free(name *grid) {                                             \
+    static inline void name##_free(name *grid) {                               \
         free(grid->cells);                                                     \
         grid->cells = NULL;                                                    \
     }                                                                          \
                                                                                \
-    type name##_get(name *grid, uint32_t x, uint32_t y) {                      \
+    static inline type name##_get(name *grid, uint32_t x, uint32_t y) {        \
         return grid->cells[y * grid->width + x];                               \
     }                                                                          \
                                                                                \
-    void name##_set(name *grid, uint32_t x, uint32_t y, type cell) {           \
+    static inline void name##_set(                                             \
+        name *grid, uint32_t x, uint32_t y, type cell                          \
+    ) {                                                                        \
         grid->cells[y * grid->width + x] = cell;                               \
     }                                                                          \
                                                                                \
-    void name##_clear(name *grid) {                                            \
+    static inline void name##_fill(name *grid, type cell) {                    \
+        for (uint64_t i = 0; i < grid->capacity; i++) grid->cells[i] = cell;   \
+    }                                                                          \
+                                                                               \
+    static inline void name##_clear(name *grid) {                              \
         for (uint64_t i = 0; i < grid->capacity; i++) grid->cells[i] = 0;      \
     }                                                                          \
 
