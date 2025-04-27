@@ -3,8 +3,8 @@
 #include "core.h"
 
 
-#define WINDOW_WIDTH 1920
-#define WINDOW_HEIGHT 1080
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 720
 #define WINDOW_CAPTION "raylib template"
 #define FPS 0
 

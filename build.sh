@@ -47,7 +47,7 @@ elif [ $1 = $WEB ]; then
     mkdir -p web
 
     # https://github.com/raysan5/raylib/wiki/Working-for-Web-(HTML5)v.sh
-    emcc -o web/game.html src/main.c -Os -Wall $HOME/raylib/src/web/libraylib.web.a \
+    emcc -o web/index.html src/main.c -Os -Wall $HOME/raylib/src/web/libraylib.web.a \
         -I. -I$HOME/raylib/src -L. -L$HOME/raylib/src/web \
         -s USE_GLFW=3 \
         -s ASYNCIFY \
@@ -56,6 +56,9 @@ elif [ $1 = $WEB ]; then
         -s TOTAL_STACK=64MB \
         -s INITIAL_MEMORY=128MB \
         -DPLATFORM_WEB
+
+    # Replace body tag with body tag that includes centring
+    sed -i 's|<body>|<body style="margin:0; height:100vh; display:flex; justify-content:center; align-items:center; background-color:black;">|' web/index.html
 
 else
     help
@@ -69,7 +72,7 @@ fi
 
 if [ $1 = $WEB ]; then
     # Run web version
-    emrun web/game.html
+    emrun web/index.html
 else
     # Run the executable that was created
     ./game.exe
