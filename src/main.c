@@ -1,94 +1,91 @@
-#include <assert.h>
 #include "raylib.h"
+#include "constants.h"
 #include "core.h"
 
 
-#define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 720
-#define WINDOW_CAPTION "raylib template"
-#define FPS 0
-
-DEFINE_TYPED_QUEUE(int8_t, Queue)
-DEFINE_TYPED_STACK(int8_t, Stack)
-DEFINE_TYPED_GRID(int8_t, Grid)
+void handle_resize();
 
 
-const uint8_t NODES = 255;
-
-int8_t value;
-Stack stack;
-Queue queue;
-Grid grid;
+WindowParameters window;
+bool handheld;
 
 
 int main(void) {
-    Stack_init(&stack, NODES);
-    Queue_init(&queue, NODES + 1);
-    Grid_init(&grid, NODES, NODES);
-
-////////////////////////////////////////////////////////////////////////////////
-// BASIC UNIT TESTS ////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-    assert(MIN('a', 'b') == 'a');
-    assert(MIN(8.0f, -8) == -8);
-
-    assert(MAX('a', 'b') == 'b');
-    assert(MAX(8.0f, -8) == 8.0f);
-
-    for (uint8_t i = 0; i < NODES; i++) {
-        assert(Stack_append(&stack, GetRandomValue(INT8_MIN, INT8_MAX)));
-        assert(Queue_append(&queue, GetRandomValue(INT8_MIN, INT8_MAX)));
-    }
-    assert(Stack_length(&stack) == NODES);
-    assert(Queue_length(&queue) == NODES);
-    for (uint8_t i = 0; i < NODES; i++) {
-        assert(Stack_pop(&stack, &value));
-        assert(Queue_pop(&queue, &value));
-    }
-    assert(Stack_length(&stack) == 0);
-    assert(Queue_length(&queue) == 0);
-
-    for (uint8_t y = 0; y < NODES; y++) {
-        for (uint8_t x = 0; x < NODES; x++) {
-            assert(Grid_get(&grid, x, y) == 0);
-        }
-    }
-    for (uint8_t y = 0; y < NODES; y++) {
-        for (uint8_t x = 0; x < NODES; x++) {
-            Grid_set(&grid, x, y, 1);
-            assert(Grid_get(&grid, x, y) == 1);
-        }
-    }
-    Grid_fill(&grid, 2);
-    for (uint8_t y = 0; y < NODES; y++) {
-        for (uint8_t x = 0; x < NODES; x++) {
-            assert(Grid_get(&grid, x, y) == 2);
-        }
-    }
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_CAPTION);
-    SetTargetFPS(FPS);
+    SetWindowMinSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    SetTargetFPS(WINDOW_FPS);
+
+    InitAudioDevice();
+    SetAudioStreamBufferSizeDefault(WINDOW_AUDIO_SAMPLES);
+
+    SetRandomSeed(0);
+
+    #ifdef WEB
+        handheld = IsMobile();
+    #endif
+    handle_resize();
+
+    Image icon = LoadImage("src/resources/icon.png");
+    SetWindowIcon(icon);
+
+    RenderTexture2D target = LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
+
     while (!WindowShouldClose()) {
-        // INPUT
-        ;
+        /*UpdateMusicStream(music);*/
+        if (IsWindowResized()) handle_resize();
 
-        // UPDATE
-        ;
+        Vector2 mouse_pos = GetMousePosition();
 
-        // RENDER
+        #ifdef WEB
+            if (!handheld) {
+                mouse_pos.x *= window.screen_width / WINDOW_WIDTH;
+                mouse_pos.y *= window.screen_height / WINDOW_HEIGHT;
+            }
+        #endif
+
+        BeginTextureMode(target);
+        ClearBackground(WHITE);
+        EndTextureMode();
+
         BeginDrawing();
-        ClearBackground(BLACK);
-        DrawFPS(8, 8);
+        ClearBackground(DARKGRAY);
+        DrawTexturePro(
+            target.texture,
+            (Rectangle){
+                0,
+                0,
+                (float)target.texture.width,
+                (float)-target.texture.height
+            },
+            (Rectangle){
+                window.offset_x,
+                window.offset_y,
+                (float)target.texture.width * window.scale,
+                (float)-target.texture.height * window.scale
+            },
+            (Vector2){0, 0},
+            0.0f,
+            WHITE
+        );
+        DrawCircleV(mouse_pos, 16, MAGENTA);
         EndDrawing();
     }
 
-    CloseWindow();
+    UnloadRenderTexture(target);
 
-    // DEINITIALISE
-    Stack_free(&stack);
-    Queue_free(&queue);
-    Grid_free(&grid);
+    CloseAudioDevice();
+    CloseWindow();
+}
+
+
+void handle_resize() {
+    window.screen_width = GetScreenWidth();
+    window.screen_height = GetScreenHeight();
+    window.scale = MIN(
+        window.screen_width / WINDOW_WIDTH,
+        window.screen_height / WINDOW_HEIGHT
+    );
+    window.offset_x = (window.screen_width - window.scale * WINDOW_WIDTH) / 2;
+    window.offset_y = (window.screen_height - window.scale * WINDOW_HEIGHT) / 2;
 }

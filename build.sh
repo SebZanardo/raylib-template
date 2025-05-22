@@ -48,6 +48,7 @@ elif [ $1 = $WEB ]; then
 
     # https://github.com/raysan5/raylib/wiki/Working-for-Web-(HTML5)v.sh
     emcc -o web/index.html src/main.c -Os -Wall $HOME/raylib/src/web/libraylib.web.a \
+        -D WEB \
         -I. -I$HOME/raylib/src -L. -L$HOME/raylib/src/web \
         -s USE_GLFW=3 \
         -s ASYNCIFY \

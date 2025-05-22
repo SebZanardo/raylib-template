@@ -14,6 +14,18 @@
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
 
+#ifdef WEB
+#include <emscripten/emscripten.h>
+
+EM_JS(bool, IsMobile, (), {
+    if (typeof navigator !== 'undefined') {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    return false;
+});
+#endif
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // STACK ///////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
