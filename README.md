@@ -3,6 +3,7 @@
 [X] Move core.c logic into core.h using macro magic
 [X] Basic unit tests in main.c
 [ ] Data structure visualisation and interaction (separate project)
+[ ] Can I write a useable version of this without malloc?
 
 DATA STRUCTURES:
 [X] Stack
@@ -11,6 +12,7 @@ DATA STRUCTURES:
 [ ] Linked List (Integer indexing in array)
 [ ] Hashset (Open addressing)
 [ ] Hashmap (Open addressing)
+[ ] Sorted Hashmap
 [ ] Binary Tree (AVL balancing)
 
 HELPER FUNCTIONS:
