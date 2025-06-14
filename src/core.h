@@ -1,14 +1,25 @@
 #ifndef CORE_H
 #define CORE_H
 
-
 #include <stdbool.h>  // Redundant for C23+, but included for compatability
 #include <stdint.h>
 #include <stdlib.h>
 
+////////////////////////////////////////////////////////////////////////////////
+// TYPEDEFS ////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+typedef int8_t   i8;
+typedef int16_t  i16;
+typedef int32_t  i32;
+typedef int64_t  i64;
+
+typedef uint8_t  u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
 
 ////////////////////////////////////////////////////////////////////////////////
-// MACRO FUNCTIONS /////////////////////////////////////////////////////////////
+// HELPER FUNCTIONS ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
@@ -18,32 +29,49 @@
 #include <emscripten/emscripten.h>
 
 EM_JS(bool, IsMobile, (), {
-    if (typeof navigator !== 'undefined') {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    }
-    return false;
+    return (
+        typeof navigator !== 'undefined' &&
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
+            .test(navigator.userAgent)
+    );
 });
 #endif
 
+
+// https://create.stephan-brumme.com/fnv-hash/
+#define FNV1A_SEED  0x811C9DC5; // 2166136261
+#define FNV1A_PRIME 0x01000193; //   16777619
+
+// No need to pass variable hash argument when hashing a u32
+static inline u32 FNV1a_u32(u32 key) {
+    u32 hash = FNV1A_SEED;
+
+    hash ^= (key >>  0) & 0xFF; hash *= FNV1A_PRIME;
+    hash ^= (key >>  8) & 0xFF; hash *= FNV1A_PRIME;
+    hash ^= (key >> 16) & 0xFF; hash *= FNV1A_PRIME;
+    hash ^= (key >> 24) & 0xFF; hash *= FNV1A_PRIME;
+
+    return hash;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // STACK ///////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 #define DEFINE_TYPED_STACK(type, name)                                         \
     typedef struct {                                                           \
-        uint32_t head;                                                         \
-        uint32_t capacity;                                                     \
+        u32 head;                                                              \
+        u32 capacity;                                                          \
         type *items;                                                           \
     } name;                                                                    \
                                                                                \
-    static inline bool name##_init(name *stack, uint32_t capacity);            \
+    static inline bool name##_init(name *stack, u32 capacity);                 \
     static inline void name##_free(name *stack);                               \
     static inline bool name##_append(name *stack, type item);                  \
     static inline bool name##_pop(name *stack, type *item);                    \
-    static inline uint32_t name##_length(name *stack);                         \
+    static inline u32 name##_length(name *stack);                              \
     static inline void name##_clear(name *stack);                              \
                                                                                \
-    static inline bool name##_init(name *stack, uint32_t capacity) {           \
+    static inline bool name##_init(name *stack, u32 capacity) {                \
         stack->items = (type *) malloc(capacity * sizeof(type));               \
                                                                                \
         if (stack->items == NULL) return false;                                \
@@ -75,7 +103,7 @@ EM_JS(bool, IsMobile, (), {
         return true;                                                           \
     }                                                                          \
                                                                                \
-    static inline uint32_t name##_length(name *stack) {                        \
+    static inline u32 name##_length(name *stack) {                             \
         return stack->head;                                                    \
     }                                                                          \
                                                                                \
@@ -83,26 +111,25 @@ EM_JS(bool, IsMobile, (), {
         stack->head = 0;                                                       \
     }                                                                          \
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // QUEUE ///////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 #define DEFINE_TYPED_QUEUE(type, name)                                         \
     typedef struct {                                                           \
-        uint32_t head;                                                         \
-        uint32_t tail;                                                         \
-        uint32_t capacity;                                                     \
+        u32 head;                                                              \
+        u32 tail;                                                              \
+        u32 capacity;                                                          \
         type *items;                                                           \
     } name;                                                                    \
                                                                                \
-    static inline bool name##_init(name *queue, uint32_t capacity);            \
+    static inline bool name##_init(name *queue, u32 capacity);                 \
     static inline void name##_free(name *queue);                               \
     static inline bool name##_append(name *queue, type item);                  \
     static inline bool name##_pop(name *queue, type *item);                    \
-    static inline uint32_t name##_length(name *queue);                         \
+    static inline u32 name##_length(name *queue);                              \
     static inline void name##_clear(name *queue);                              \
                                                                                \
-    static inline bool name##_init(name *queue, uint32_t capacity) {           \
+    static inline bool name##_init(name *queue, u32 capacity) {                \
         queue->items = (type *) malloc(capacity * sizeof(type));               \
                                                                                \
         if (queue->items == NULL) return false;                                \
@@ -119,7 +146,7 @@ EM_JS(bool, IsMobile, (), {
     }                                                                          \
                                                                                \
     static inline bool name##_append(name *queue, type item) {                 \
-        uint32_t next = (queue->tail + 1) % queue->capacity;                   \
+        u32 next = (queue->tail + 1) % queue->capacity;                        \
                                                                                \
         if (next == queue->head) return false;                                 \
                                                                                \
@@ -138,7 +165,7 @@ EM_JS(bool, IsMobile, (), {
         return true;                                                           \
     }                                                                          \
                                                                                \
-    static inline uint32_t name##_length(name *queue) {                        \
+    static inline u32 name##_length(name *queue) {                             \
         return (queue->tail + queue->capacity - queue->head) % queue->capacity;\
     }                                                                          \
                                                                                \
@@ -147,32 +174,25 @@ EM_JS(bool, IsMobile, (), {
         queue->tail = 0;                                                       \
     }                                                                          \
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // GRID ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 #define DEFINE_TYPED_GRID(type, name)                                          \
     typedef struct {                                                           \
-        uint64_t capacity;                                                     \
-        uint32_t height;                                                       \
-        uint32_t width;                                                        \
+        u64 capacity;                                                          \
+        u32 height;                                                            \
+        u32 width;                                                             \
         type *cells;                                                           \
     } name;                                                                    \
                                                                                \
-    static inline bool name##_init(                                            \
-        name *grid, uint32_t width, uint32_t height                            \
-    );                                                                         \
+    static inline bool name##_init(name *grid, u32 width, u32 height);         \
     static inline void name##_free(name *grid);                                \
-    static inline type name##_get(name *grid, uint32_t x, uint32_t y);         \
-    static inline void name##_set(                                             \
-        name *grid, uint32_t x, uint32_t y, type cell                          \
-    );                                                                         \
+    static inline type name##_get(name *grid, u32 x, u32 y);                   \
+    static inline void name##_set(name *grid, u32 x, u32 y, type cell);        \
     static inline void name##_fill(name *grid, type cell);                     \
                                                                                \
-    static inline bool name##_init(                                            \
-        name *grid, uint32_t width, uint32_t height                            \
-    ) {                                                                        \
-        uint64_t capacity = width * height;                                    \
+    static inline bool name##_init(name *grid, u32 width, u32 height) {        \
+        u64 capacity = width * height;                                         \
         grid->cells = (type *) malloc(capacity * sizeof(type));                \
                                                                                \
         if (grid->cells == NULL) return false;                                 \
@@ -191,19 +211,20 @@ EM_JS(bool, IsMobile, (), {
         grid->cells = NULL;                                                    \
     }                                                                          \
                                                                                \
-    static inline type name##_get(name *grid, uint32_t x, uint32_t y) {        \
+    static inline type name##_get(name *grid, u32 x, u32 y) {                  \
         return grid->cells[y * grid->width + x];                               \
     }                                                                          \
                                                                                \
-    static inline void name##_set(                                             \
-        name *grid, uint32_t x, uint32_t y, type cell                          \
-    ) {                                                                        \
+    static inline void name##_set(name *grid, u32 x, u32 y, type cell) {       \
         grid->cells[y * grid->width + x] = cell;                               \
     }                                                                          \
                                                                                \
     static inline void name##_fill(name *grid, type cell) {                    \
-        for (uint64_t i = 0; i < grid->capacity; i++) grid->cells[i] = cell;   \
+        for (u64 i = 0; i < grid->capacity; i++) grid->cells[i] = cell;        \
     }                                                                          \
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 #endif  /* CORE_H */
