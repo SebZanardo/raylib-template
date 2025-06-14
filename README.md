@@ -5,6 +5,14 @@
 [ ] Data structure visualisation and interaction (separate project)
 [ ] Can I write a useable version of this without malloc?
 
+TYPEDEFS:
+[X] stdint.h
+
+HELPER FUNCTIONS:
+[X] Min and Max function
+[X] IsMobile, web build function
+[X] FNV1a hash function for u32
+
 DATA STRUCTURES:
 [X] Stack
 [X] Queue (Circular)
@@ -14,7 +22,4 @@ DATA STRUCTURES:
 [ ] Hashmap (Open addressing)
 [ ] Sorted Hashmap
 [ ] Binary Tree (AVL balancing)
-
-HELPER FUNCTIONS:
-[X] Min and Max function
 ```
