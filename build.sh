@@ -60,7 +60,16 @@ elif [ $1 = $WEB ]; then
         -DPLATFORM_WEB
 
     # Replace body tag with with a centred one
-    sed -i 's|<body>|<body style="margin:0; height:100vh; display:flex; justify-content:center; align-items:center; background-color:black;">|' web/index.html
+    sed -i 's|<body>|\
+        <body style="\
+        margin:0; \
+        height:100vh; \
+        display:flex; \
+        justify-content:center; \
+        align-items:center; \
+        background-color:black;\
+        ">|'
+        web/index.html
 
 else
     help
