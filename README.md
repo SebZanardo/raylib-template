@@ -3,7 +3,7 @@
 [X] Move core.c logic into core.h using macro magic
 [X] Basic unit tests in main.c
 [ ] Data structure visualisation and interaction (separate project)
-[ ] Can I write a useable version of this without malloc?
+[ ] Can I write a useable version of core.h without malloc?
 
 TYPEDEFS:
 [X] stdint.h
@@ -11,7 +11,7 @@ TYPEDEFS:
 HELPER FUNCTIONS:
 [X] Min and Max function
 [X] IsMobile, web build function
-[X] FNV1a hash function for u32
+[X] Fast FNV1a hash function for u32
 
 DATA STRUCTURES:
 [X] Stack

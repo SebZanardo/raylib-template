@@ -39,17 +39,16 @@ EM_JS(bool, IsMobile, (), {
 
 
 // https://create.stephan-brumme.com/fnv-hash/
-#define FNV1A_SEED  0x811C9DC5; // 2166136261
-#define FNV1A_PRIME 0x01000193; //   16777619
+#define FNV1_SEED_32  0x811C9DC5;  // 2166136261
+#define FNV1_PRIME_32 0x01000193;  //   16777619
 
-// No need to pass variable hash argument when hashing a u32
-static inline u32 FNV1a_u32(u32 key) {
-    u32 hash = FNV1A_SEED;
+static inline u32 FNV1a_u32a(u32 data) {
+    u32 hash = FNV1_SEED_32;
 
-    hash ^= (key >>  0) & 0xFF; hash *= FNV1A_PRIME;
-    hash ^= (key >>  8) & 0xFF; hash *= FNV1A_PRIME;
-    hash ^= (key >> 16) & 0xFF; hash *= FNV1A_PRIME;
-    hash ^= (key >> 24) & 0xFF; hash *= FNV1A_PRIME;
+    hash = (((data >>  0) & 0xFF) ^ hash) * FNV1_PRIME_32;
+    hash = (((data >>  8) & 0xFF) ^ hash) * FNV1_PRIME_32;
+    hash = (((data >> 16) & 0xFF) ^ hash) * FNV1_PRIME_32;
+    hash = (((data >> 24) & 0xFF) ^ hash) * FNV1_PRIME_32;
 
     return hash;
 }
@@ -59,9 +58,9 @@ static inline u32 FNV1a_u32(u32 key) {
 ////////////////////////////////////////////////////////////////////////////////
 #define DEFINE_TYPED_STACK(type, name)                                         \
     typedef struct {                                                           \
+        type *items;                                                           \
         u32 head;                                                              \
         u32 capacity;                                                          \
-        type *items;                                                           \
     } name;                                                                    \
                                                                                \
     static inline bool name##_init(name *stack, u32 capacity);                 \
@@ -76,8 +75,8 @@ static inline u32 FNV1a_u32(u32 key) {
                                                                                \
         if (stack->items == NULL) return false;                                \
                                                                                \
-        name##_clear(stack);                                                   \
         stack->capacity = capacity;                                            \
+        name##_clear(stack);                                                   \
                                                                                \
         return true;                                                           \
     }                                                                          \
@@ -116,10 +115,10 @@ static inline u32 FNV1a_u32(u32 key) {
 ////////////////////////////////////////////////////////////////////////////////
 #define DEFINE_TYPED_QUEUE(type, name)                                         \
     typedef struct {                                                           \
+        type *items;                                                           \
         u32 head;                                                              \
         u32 tail;                                                              \
         u32 capacity;                                                          \
-        type *items;                                                           \
     } name;                                                                    \
                                                                                \
     static inline bool name##_init(name *queue, u32 capacity);                 \
@@ -134,8 +133,8 @@ static inline u32 FNV1a_u32(u32 key) {
                                                                                \
         if (queue->items == NULL) return false;                                \
                                                                                \
-        name##_clear(queue);                                                   \
         queue->capacity = capacity;                                            \
+        name##_clear(queue);                                                   \
                                                                                \
         return true;                                                           \
     }                                                                          \
@@ -179,10 +178,10 @@ static inline u32 FNV1a_u32(u32 key) {
 ////////////////////////////////////////////////////////////////////////////////
 #define DEFINE_TYPED_GRID(type, name)                                          \
     typedef struct {                                                           \
+        type *cells;                                                           \
         u64 capacity;                                                          \
         u32 height;                                                            \
         u32 width;                                                             \
-        type *cells;                                                           \
     } name;                                                                    \
                                                                                \
     static inline bool name##_init(name *grid, u32 width, u32 height);         \
